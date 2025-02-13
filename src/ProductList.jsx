@@ -1,9 +1,16 @@
 import React, { useState,useEffect } from 'react';
+import {useDispatch,useSelector} from 'react-redux';
 import './ProductList.css'
 import CartItem from './CartItem';
+import { addItem } from './CartSlice';
+
+
 function ProductList() {
+    const dispatch = useDispatch();
+
     const [showCart, setShowCart] = useState(false); 
     const [showPlants, setShowPlants] = useState(false); // State to control the visibility of the About Us page
+    const [addedToCart, setAddedToCart] = useState({}); // State to store the items added to the cart
 
     const plantsArray = [
         {
@@ -246,6 +253,12 @@ const handlePlantsClick = (e) => {
     e.preventDefault();
     setShowCart(false);
   };
+
+  const handleAddToCart = (plant) => {
+    dispatch( addItem(plant) );
+    setAddedToCart((prevState) => ( { ...prevState, [plant.name]: true }));
+  };
+
     return (
         <div>
              <div className="navbar" style={styleObj}>
@@ -268,8 +281,23 @@ const handlePlantsClick = (e) => {
         </div>
         {!showCart? (
         <div className="product-grid">
+            {plantsArray.map( (category, index) => (
+                <>
+                <h2 className='plant_heading'>{category.category}</h2>
+                <div className='product-list'>
 
-
+                    {category.plants.map((plant, index) => (
+                        <div className='product-card'>
+                            <h3 className='product-title'>{plant.name}</h3>
+                            <img className='product-image' src={plant.image} alt={plant.name} />
+                            <p className='product-price'>{plant.cost}</p>
+                            <p>{plant.description}</p>
+                            <button className='product-button' onClick={() => handleAddToCart(plant)}>Add to Cart</button>
+                        </div>
+                    ))}
+                </div>
+                </>
+            ))}
         </div>
  ) :  (
     <CartItem onContinueShopping={handleContinueShopping}/>
